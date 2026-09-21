@@ -1,0 +1,26 @@
+public class Lecturer extends Staff implements ICapability{
+    private double teachingHours;
+    public Lecturer(String id, String name, double baseSalary,
+                    double teachingHours) {
+        super(id, name, baseSalary);
+        this.teachingHours = teachingHours;
+    }
+    public double getTeachingHours() {
+        return teachingHours;
+    }
+    public void setTeachingHours(double teachingHours) {
+        this.teachingHours = teachingHours;
+    }
+    @Override
+    public double calculateTotalSalary() {
+        return getBaseSalary() + teachingHours * 200000;
+    }
+    @Override
+    public void checkPerformance() {
+        if (teachingHours >= 100) {
+            System.out.println("Hieu suat: Tot");
+        } else {
+            System.out.println("Hieu suat: Can cai thien");
+        }
+    }
+}
