@@ -1,0 +1,32 @@
+public class AdminStaff extends Staff implements ICapability{
+    private double bonus;
+    public AdminStaff(String id, String name, double baseSalary, double bonus)
+    {
+        super(id, name, baseSalary);
+        this.bonus = bonus;
+    }
+    public double getBonus()
+    {
+        return bonus;
+    }
+    public void setBonus(double bonus)
+    {
+        this.bonus = bonus;
+    }
+    @Override
+    public double calculateTotalSalary()
+    {
+        return getBaseSalary() + bonus;
+    }
+    @Override
+    public void checkPerformance()
+    {
+        if (bonus >= 5000000)
+        {
+            System.out.println("Hieu suat: Tot");
+        } else
+        {
+            System.out.println("Hieu suat: Can cai thien");
+        }
+    }
+}
