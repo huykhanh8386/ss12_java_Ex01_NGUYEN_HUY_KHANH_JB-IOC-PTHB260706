@@ -1,0 +1,221 @@
+import java.util.Scanner;
+public class Main {
+    static Scanner sc = new Scanner(System.in);
+    static Staff[] staffList = new Staff[100];
+    static int count = 0;
+    public static void main(String[] args) {
+        int choice;
+        while (true) {
+            showMenu();
+            choice = inputInt("Nhap lua chon: ");
+            switch (choice) {
+                case 1:
+                    addStaff();
+                    break;
+                case 2:
+                    displayStaff();
+                    break;
+                case 3:
+                    updateStaff();
+                    break;
+                case 4:
+                    deleteStaff();
+                    break;
+                case 5:
+                    System.out.println("\nCam on ban da su dung chuong trinh!");
+                    sc.close();
+                    return;
+                default:
+                    System.out.println("Lua chon khong hop le!");
+            }
+        }
+    }
+    public static void showMenu() {
+        System.out.println("\n==============================================");
+        System.out.println("     HE THONG QUAN LY NHAN VIEN");
+        System.out.println("==============================================");
+        System.out.println("1. Them moi");
+        System.out.println("2. Hien thi danh sach");
+        System.out.println("3. Cap nhat");
+        System.out.println("4. Xoa");
+        System.out.println("5. Thoat");
+        System.out.println("==============================================");
+    }
+    public static void addStaff() {
+        if (count >= staffList.length) {
+            System.out.println("Danh sach da day!");
+            return;
+        }
+        System.out.println("\n--- THEM NHAN VIEN ---");
+        System.out.println("1. Giang vien");
+        System.out.println("2. Nhan vien hanh chinh");
+        int type = inputInt("Chon loai nhan vien: ");
+        if (type != 1 && type != 2) {
+            System.out.println("Loai nhan vien khong hop le!");
+            return;
+        }
+        String id = inputString("Nhap ID: ");
+        if (findById(id) != -1) {
+            System.out.println("ID da ton tai!");
+            return;
+        }
+        String name = inputString("Nhap ten: ");
+        double baseSalary = inputDouble("Nhap luong co ban: ");
+        if (baseSalary < 0) {
+            System.out.println("Luong khong duoc am!");
+            return;
+        }
+        if (type == 1) {
+            double teachingHours =
+                    inputDouble("Nhap so gio giang day: ");
+            if (teachingHours < 0) {
+                System.out.println("So gio khong duoc am!");
+                return;
+            }
+            staffList[count] = new Lecturer(id, name, baseSalary, teachingHours);
+        } else {
+            double bonus = inputDouble("Nhap tien thuong: ");
+            if (bonus < 0) {
+                System.out.println("Tien thuong khong duoc am!");
+                return;
+            }
+            staffList[count] = new AdminStaff(id, name, baseSalary, bonus);
+        }
+        count++;
+        System.out.println("-> Them nhan vien thanh cong!");
+    }
+    public static void displayStaff() {
+        if (count == 0) {
+            System.out.println("\nDanh sach nhan vien dang rong!");
+            return;
+        }
+        System.out.println("\n======================================================================");
+        System.out.println("                    DANH SACH NHAN VIEN");
+        System.out.println("======================================================================");
+        for (int i = 0; i < count; i++) {
+            Staff staff = staffList[i];
+            System.out.println("\nNhan vien thu " + (i + 1));
+            System.out.println("ID: " + staff.getId());
+            System.out.println("Ten: " + staff.getName());
+            System.out.printf("Luong co ban: %,.2f VNĐ%n", staff.getBaseSalary());
+            if (staff instanceof Lecturer) {
+                Lecturer lecturer = (Lecturer) staff;
+                System.out.println("Loai: Giang vien");
+                System.out.println("So gio giang day: " + lecturer.getTeachingHours());
+            } else if (staff instanceof AdminStaff) {
+                AdminStaff admin = (AdminStaff) staff;
+                System.out.println("Loai: Nhan vien hanh chinh");
+                System.out.printf("Tien thuong: %,.2f VNĐ%n", admin.getBonus());
+            }
+            System.out.printf("LUONG THUC NHAN: %,.2f VNĐ%n", staff.calculateTotalSalary());
+            if (staff instanceof ICapability) {
+                ICapability capability = (ICapability) staff;
+                capability.checkPerformance();
+            }
+        }
+    }
+    public static void updateStaff() {
+        if (count == 0) {
+            System.out.println("Danh sach dang rong!");
+            return;
+        }
+        String id = inputString("Nhap ID can cap nhat: ");
+        int index = findById(id);
+        if (index == -1) {
+            System.out.println("Khong tim thay nhan vien!");
+            return;
+        }
+        Staff staff = staffList[index];
+        System.out.println("\n--- THONG TIN HIEN TAI ---");
+        System.out.println("ID: " + staff.getId());
+        System.out.println("Ten: " + staff.getName());
+        System.out.printf("Luong co ban: %,.2f VNĐ%n", staff.getBaseSalary()
+        );
+        System.out.println("\n--- NHAP THONG TIN MOI ---");
+        String newName = inputString("Nhap ten moi: ");
+        double newBaseSalary =
+                inputDouble("Nhap luong co ban moi: ");
+        if (newBaseSalary < 0) {
+            System.out.println("Luong khong duoc am!");
+            return;
+        }
+        staff.setName(newName);
+        staff.setBaseSalary(newBaseSalary);
+        if (staff instanceof Lecturer) {
+            Lecturer lecturer = (Lecturer) staff;
+            double hours =
+                    inputDouble("Nhap so gio giang day moi: ");
+            if (hours < 0) {
+                System.out.println("So gio khong duoc am!");
+                return;
+            }
+            lecturer.setTeachingHours(hours);
+        } else if (staff instanceof AdminStaff) {
+            AdminStaff admin = (AdminStaff) staff;
+            double bonus =
+                    inputDouble("Nhap tien thuong moi: ");
+            if (bonus < 0) {
+                System.out.println("Tien thuong khong duoc am!");
+                return;
+            }
+            admin.setBonus(bonus);
+        }
+        System.out.println("-> Cap nhat thanh cong!");
+    }
+    public static void deleteStaff() {
+        if (count == 0) {
+            System.out.println("Danh sach dang rong!");
+            return;
+        }
+        String id = inputString("Nhap ID can xoa: ");
+        int index = findById(id);
+        if (index == -1) {
+            System.out.println("Khong tim thay nhan vien!");
+            return;
+        }
+        for (int i = index; i < count - 1; i++) {
+            staffList[i] = staffList[i + 1];
+        }
+        staffList[count - 1] = null;
+        count--;
+        System.out.println("-> Xoa nhan vien thanh cong!");
+    }
+    public static int findById(String id) {
+        for (int i = 0; i < count; i++) {
+            if (staffList[i].getId().equalsIgnoreCase(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public static int inputInt(String message) {
+        while (true) {
+            try {
+                System.out.print(message);
+                return Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Loi! Vui long nhap so nguyen.");
+            }
+        }
+    }
+    public static double inputDouble(String message) {
+        while (true) {
+            try {
+                System.out.print(message);
+                return Double.parseDouble(sc.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Loi! Vui long nhap so.");
+            }
+        }
+    }
+    public static String inputString(String message) {
+        while (true) {
+            System.out.print(message);
+            String value = sc.nextLine().trim();
+            if (!value.isEmpty()) {
+                return value;
+            }
+            System.out.println("Khong duoc de trong!");
+        }
+    }
+}
